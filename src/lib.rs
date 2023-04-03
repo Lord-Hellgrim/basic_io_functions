@@ -1,4 +1,5 @@
 use std::{path::Path, fs::read_to_string, collections::HashMap};
+use std::fs::File;
 
 pub fn split_string(s: String, sep: char) -> Vec<String> {
     let mut output = Vec::new();
@@ -67,6 +68,7 @@ pub fn hashmap_to_string(map: &mut HashMap<String, HashMap<String, String>>, hea
         printer.push_str(&item);
         printer.push(sep);
     }
+    printer.pop().unwrap();
     printer.push('\n');
 
     let mut i: usize = 0;
@@ -77,6 +79,7 @@ pub fn hashmap_to_string(map: &mut HashMap<String, HashMap<String, String>>, hea
             printer.push(sep);
             i += 1;
         }
+        printer.pop().unwrap();
         printer.push('\n');
         i = 0;
     }
@@ -87,6 +90,8 @@ pub fn hashmap_to_string(map: &mut HashMap<String, HashMap<String, String>>, hea
 
 #[cfg(test)]
 mod tests {
+    use std::{io::Write};
+
     use super::*;
 
     #[test]
@@ -133,5 +138,17 @@ mod tests {
         let (header, mut map) = read_to_hashmap(&path, sep, 0);
         let s = hashmap_to_string(&mut map, header, sep);
         println!("{s}");
+    }
+
+    #[test]
+    fn test_write() {
+        let path = Path::new("sample_data.txt");
+        let sep = '\t';
+        let (header, mut map) = read_to_hashmap(&path, sep, 0);
+        let s = hashmap_to_string(&mut map, header, ';');
+
+        println!("{}", s);
+        let mut file = File::create("sample_output.txt").unwrap();
+        file.write_all(s.as_bytes()).unwrap();
     }
 }
